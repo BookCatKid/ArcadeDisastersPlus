@@ -1,0 +1,31 @@
+{
+  "schemaVersion": 1,
+  "id": "arcadedisasterplus",
+  "version": "${version}",
+  "name": "ArcadeDisaster+",
+  "description": "",
+  "authors": [],
+  "contact": {},
+  "license": "MIT",
+  "icon": "assets/arcadedisasterplus/icon.png",
+  "environment": "client",
+  "entrypoints": {
+    "fabric-datagen": [
+      "com.simon.arcadedisasterplus.arcadedisasterplus.client.ArcadedisasterplusDataGenerator"
+    ],
+    "client": [
+      "com.simon.arcadedisasterplus.arcadedisasterplus.client.ArcadedisasterplusClient"
+    ],
+    "main": [
+      "com.simon.arcadedisasterplus.arcadedisasterplus.Arcadedisasterplus"
+    ]
+  },
+  "mixins": [
+    "arcadedisasterplus.mixins.json"
+  ],
+  "depends": {
+    "fabricloader": ">=${loader_version}",
+    "fabric-api": "*",
+    "minecraft": "${minecraft_version}"
+  }
+}
