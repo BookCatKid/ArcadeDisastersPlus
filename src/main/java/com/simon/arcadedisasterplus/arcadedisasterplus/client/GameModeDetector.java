@@ -9,12 +9,16 @@ import net.minecraft.client.font.TextRenderer;
 import net.minecraft.scoreboard.Scoreboard;
 import net.minecraft.scoreboard.ScoreboardDisplaySlot;
 import net.minecraft.scoreboard.ScoreboardObjective;
+import net.minecraft.scoreboard.Team;
 import net.minecraft.text.OrderedText;
 import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -23,12 +27,14 @@ public class GameModeDetector {
     private static boolean isInDisastersGame = false;
     private static final Pattern DISASTER_START_PATTERN = Pattern.compile("^([A-Z\\s]+) - (.*!)$");
 
-    private static final List<String> currentDisasters = new ArrayList<>();
-    private static final List<String> currentDescriptions = new ArrayList<>();
+    private static final List<String> pendingNames = new ArrayList<>();
+    private static final List<String> pendingDescriptions = new ArrayList<>();
     private static int titleDelayTimer = 0;
 
     private static int customTitleTimer = 0;
     private static final List<String[]> displayEntries = new ArrayList<>();
+
+    private static final Set<String> endedDisasters = new HashSet<>();
 
     public static void register() {
         ClientTickEvents.END_CLIENT_TICK.register(client -> {
@@ -40,9 +46,14 @@ public class GameModeDetector {
                     client.player.sendMessage(Text.literal("§c[ArcadeDisaster+] §aJoined Disasters game!"), false);
                 }
             } else if (!isInDisastersGame && wasInGame) {
+                endedDisasters.clear();
                 if (client.player != null) {
                     client.player.sendMessage(Text.literal("§c[ArcadeDisaster+] §eLeft Disasters game."), false);
                 }
+            }
+
+            if (isInDisastersGame) {
+                checkEndedDisasters(client);
             }
 
             if (customTitleTimer > 0) {
@@ -51,15 +62,15 @@ public class GameModeDetector {
 
             if (titleDelayTimer > 0) {
                 titleDelayTimer--;
-                if (titleDelayTimer == 0 && !currentDisasters.isEmpty() && client.inGameHud != null) {
+                if (titleDelayTimer == 0 && !pendingNames.isEmpty() && client.inGameHud != null) {
                     displayEntries.clear();
-                    for (int i = 0; i < currentDisasters.size(); i++) {
-                        displayEntries.add(new String[]{currentDisasters.get(i), currentDescriptions.get(i)});
+                    for (int i = 0; i < pendingNames.size(); i++) {
+                        displayEntries.add(new String[]{pendingNames.get(i), pendingDescriptions.get(i)});
                     }
                     customTitleTimer = 100;
 
-                    currentDisasters.clear();
-                    currentDescriptions.clear();
+                    pendingNames.clear();
+                    pendingDescriptions.clear();
                 }
             }
         });
@@ -82,17 +93,21 @@ public class GameModeDetector {
                     for (String[] entry : displayEntries) {
                         String name = entry[0];
                         String description = entry[1];
+                        boolean ended = entry.length > 2 && "ended".equals(entry[2]);
 
                         context.getMatrices().pushMatrix();
                         context.getMatrices().translate(width / 2f, yPos);
                         context.getMatrices().scale(titleScale, titleScale);
-                        Text titleText = Text.literal("§c§l" + name);
+                        Text titleText = ended
+                                ? Text.literal("§7§l§m" + name)
+                                : Text.literal("§c§l" + name);
                         context.drawText(textRenderer, titleText, -textRenderer.getWidth(titleText) / 2, 0, 0xFFFFFFFF, true);
                         context.getMatrices().popMatrix();
 
                         yPos += textRenderer.fontHeight * titleScale + 3;
 
-                        List<OrderedText> lines = textRenderer.wrapLines(Text.literal("§e" + description), maxSubtitleWidth);
+                        String subtitleColor = ended ? "§8" : "§e";
+                        List<OrderedText> lines = textRenderer.wrapLines(Text.literal(subtitleColor + description), maxSubtitleWidth);
                         context.getMatrices().pushMatrix();
                         context.getMatrices().translate(width / 2f, yPos);
                         for (OrderedText line : lines) {
@@ -117,8 +132,8 @@ public class GameModeDetector {
                 String disasterName = matcher.group(1).trim();
                 String description = matcher.group(2).trim();
 
-                currentDisasters.add(disasterName);
-                currentDescriptions.add(description);
+                pendingNames.add(disasterName);
+                pendingDescriptions.add(description);
 
                 titleDelayTimer = 2;
 
@@ -129,6 +144,61 @@ public class GameModeDetector {
                 });
             }
         });
+    }
+
+    private static void checkEndedDisasters(MinecraftClient client) {
+        if (client.world == null || client.player == null) return;
+
+        Scoreboard scoreboard = client.world.getScoreboard();
+        ScoreboardObjective objective = scoreboard.getObjectiveForSlot(ScoreboardDisplaySlot.SIDEBAR);
+        if (objective == null) return;
+
+        boolean inDisasterSection = false;
+        List<Map.Entry<Integer, String>> entries = new ArrayList<>();
+
+        scoreboard.getScoreboardEntries(objective).forEach(entry -> {
+            Team team = scoreboard.getScoreHolderTeam(entry.owner());
+            if (team == null) return;
+            String text = team.getPrefix().getString() + team.getSuffix().getString();
+            String rawText = team.getPrefix().toString() + team.getSuffix().toString();
+            entries.add(Map.entry(entry.value(), rawText + "|" + text));
+        });
+
+        entries.sort((a, b) -> Integer.compare(b.getKey(), a.getKey()));
+
+        List<String> newlyEnded = new ArrayList<>();
+
+        for (Map.Entry<Integer, String> entry : entries) {
+            String[] parts = entry.getValue().split("\\|", 2);
+            String rawText = parts[0];
+            String text = parts.length > 1 ? parts[1] : "";
+
+            if (text.trim().equals("Disasters:")) {
+                inDisasterSection = true;
+                continue;
+            }
+
+            if (inDisasterSection) {
+                if (text.trim().isEmpty()) break;
+
+                String disasterName = text.replaceAll("§[0-9a-fk-or]", "").trim();
+                if (disasterName.isEmpty()) continue;
+
+                if (rawText.contains("§m") && !endedDisasters.contains(disasterName)) {
+                    endedDisasters.add(disasterName);
+                    newlyEnded.add(disasterName);
+                    client.player.sendMessage(Text.literal("§c[ArcadeDisaster+] §7Disaster ended: §m" + disasterName), false);
+                }
+            }
+        }
+
+        if (!newlyEnded.isEmpty()) {
+            displayEntries.clear();
+            for (String name : newlyEnded) {
+                displayEntries.add(new String[]{name, "Disaster ended!", "ended"});
+            }
+            customTitleTimer = 60;
+        }
     }
 
     private static boolean checkIsInDisastersGame(MinecraftClient client) {
