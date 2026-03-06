@@ -41,11 +41,12 @@ public class GameModeDetector {
             boolean wasInGame = isInDisastersGame;
             isInDisastersGame = checkIsInDisastersGame(client);
 
-            if (isInDisastersGame && !wasInGame) {
+            if (isInDisastersGame && !wasInGame && ArcadedisasterplusConfig.devMode) {
                 if (client.player != null) {
+                    // don't actually know what the point of these is but...
                     client.player.sendMessage(Text.literal("§c[ArcadeDisaster+] §aJoined Disasters game!"), false);
                 }
-            } else if (!isInDisastersGame && wasInGame) {
+            } else if (!isInDisastersGame && wasInGame && ArcadedisasterplusConfig.devMode) {
                 endedDisasters.clear();
                 if (client.player != null) {
                     client.player.sendMessage(Text.literal("§c[ArcadeDisaster+] §eLeft Disasters game."), false);
@@ -63,11 +64,13 @@ public class GameModeDetector {
             if (titleDelayTimer > 0) {
                 titleDelayTimer--;
                 if (titleDelayTimer == 0 && !pendingNames.isEmpty() && client.inGameHud != null) {
-                    displayEntries.clear();
-                    for (int i = 0; i < pendingNames.size(); i++) {
-                        displayEntries.add(new String[]{pendingNames.get(i), pendingDescriptions.get(i)});
+                    if (ArcadedisasterplusConfig.showDisasterTitles) {
+                        displayEntries.clear();
+                        for (int i = 0; i < pendingNames.size(); i++) {
+                            displayEntries.add(new String[]{pendingNames.get(i), pendingDescriptions.get(i)});
+                        }
+                        customTitleTimer = 100;
                     }
-                    customTitleTimer = 100;
 
                     pendingNames.clear();
                     pendingDescriptions.clear();
@@ -137,11 +140,13 @@ public class GameModeDetector {
 
                 titleDelayTimer = 2;
 
-                MinecraftClient.getInstance().execute(() -> {
-                    if (MinecraftClient.getInstance().player != null) {
-                        MinecraftClient.getInstance().player.sendMessage(Text.literal("§c[ArcadeDisaster+] §6Disaster started: §e" + disasterName), false);
-                    }
-                });
+                if (ArcadedisasterplusConfig.showChatMessages) {
+                    MinecraftClient.getInstance().execute(() -> {
+                        if (MinecraftClient.getInstance().player != null) {
+                            MinecraftClient.getInstance().player.sendMessage(Text.literal("§c[ArcadeDisaster+] §6Disaster started: §e" + disasterName), false);
+                        }
+                    });
+                }
             }
         });
     }
@@ -187,12 +192,14 @@ public class GameModeDetector {
                 if (rawText.contains("§m") && !endedDisasters.contains(disasterName)) {
                     endedDisasters.add(disasterName);
                     newlyEnded.add(disasterName);
-                    client.player.sendMessage(Text.literal("§c[ArcadeDisaster+] §7Disaster ended: §m" + disasterName), false);
+                    if (ArcadedisasterplusConfig.showChatMessages) {
+                        client.player.sendMessage(Text.literal("§c[ArcadeDisaster+] §7Disaster ended: §m" + disasterName), false);
+                    }
                 }
             }
         }
 
-        if (!newlyEnded.isEmpty()) {
+        if (!newlyEnded.isEmpty() && ArcadedisasterplusConfig.showEndedTitles) {
             displayEntries.clear();
             for (String name : newlyEnded) {
                 displayEntries.add(new String[]{name, "Disaster ended!", "ended"});

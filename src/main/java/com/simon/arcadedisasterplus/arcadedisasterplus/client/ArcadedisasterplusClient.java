@@ -16,11 +16,13 @@ public class ArcadedisasterplusClient implements ClientModInitializer {
 
     @Override
     public void onInitializeClient() {
+        ArcadedisasterplusConfig.load();
+
         ClientPlayConnectionEvents.JOIN.register((handler, sender, client) -> {
-            if (client.getCurrentServerEntry() != null && client.getCurrentServerEntry().address.toLowerCase().contains("hypixel.net")) {
+            if (ArcadedisasterplusConfig.devMode && client.getCurrentServerEntry() != null && (client.getCurrentServerEntry().address.toLowerCase().equals("hypixel.net") || client.getCurrentServerEntry().address.toLowerCase().endsWith(".hypixel.net"))) {
                 client.execute(() -> {
                     if (client.player != null) {
-                        client.player.sendMessage(Text.literal("§c[ArcadeDisaster+] §aSuccessfully logged into Hypixel! Mod base active."), false);
+                        client.player.sendMessage(Text.literal("§c[ArcadeDisaster+] §aYou are on Hypixel."), false);
                     }
                 });
             }

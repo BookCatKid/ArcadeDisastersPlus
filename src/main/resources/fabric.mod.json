@@ -12,6 +12,9 @@
   "entrypoints": {
     "client": [
       "com.simon.arcadedisasterplus.arcadedisasterplus.client.ArcadedisasterplusClient"
+    ],
+    "modmenu": [
+      "com.simon.arcadedisasterplus.arcadedisasterplus.client.ModMenuIntegration"
     ]
   },
   "mixins": [
