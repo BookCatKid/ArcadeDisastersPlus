@@ -39,54 +39,6 @@ public class ArcadedisastersplusClient implements ClientModInitializer {
                 return 1;
             }));
 
-            //TODO: Remove debug command soon please
-            dispatcher.register(literal("debugscoreboard").executes(context -> {
-                MinecraftClient client = MinecraftClient.getInstance();
-                if (client.world == null || client.player == null) {
-                    context.getSource().sendFeedback(Text.literal("§cNo world loaded."));
-                    return 0;
-                }
-
-                Scoreboard scoreboard = client.world.getScoreboard();
-                ScoreboardObjective objective = scoreboard.getObjectiveForSlot(ScoreboardDisplaySlot.SIDEBAR);
-                if (objective == null) {
-                    context.getSource().sendFeedback(Text.literal("§cNo sidebar objective found."));
-                    return 0;
-                }
-
-                context.getSource().sendFeedback(Text.literal("§6--- Scoreboard Debug ---"));
-                context.getSource().sendFeedback(Text.literal("§eTitle: §f" + objective.getDisplayName().getString()));
-                context.getSource().sendFeedback(Text.literal("§eTitle (raw): §f" + objective.getDisplayName().toString()));
-
-                scoreboard.getScoreboardEntries(objective).forEach(entry -> {
-                    String playerName = entry.owner();
-                    int score = entry.value();
-                    Text display = entry.display();
-
-                    Team team = scoreboard.getScoreHolderTeam(playerName);
-                    String prefix = team != null ? team.getPrefix().getString() : "";
-                    String suffix = team != null ? team.getSuffix().getString() : "";
-                    String rawPrefix = team != null ? team.getPrefix().toString() : "null";
-                    String rawSuffix = team != null ? team.getSuffix().toString() : "null";
-
-                    context.getSource().sendFeedback(Text.literal(
-                            "§a[" + score + "] §fowner='" + playerName
-                                    + "' display=" + (display != null ? display.getString() : "null")
-                                    + " prefix='" + prefix + "' suffix='" + suffix + "'"
-                    ));
-                    context.getSource().sendFeedback(Text.literal(
-                            "  §7rawPrefix=" + rawPrefix
-                    ));
-                    context.getSource().sendFeedback(Text.literal(
-                            "  §7rawSuffix=" + rawSuffix
-                    ));
-                });
-
-                context.getSource().sendFeedback(Text.literal("§6--- End ---"));
-                return 1;
-            }));
-        });
-
         GameModeDetector.register();
     }
 }
