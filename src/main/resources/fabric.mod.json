@@ -3,9 +3,13 @@
   "id": "arcadedisastersplus",
   "version": "${version}",
   "name": "ArcadeDisasters+",
-  "description": "",
-  "authors": [],
-  "contact": {},
+  "description": "Simple mod with enhanced notifications and QOL features for the Hypixel 'Disasters' arcade game.",
+  "authors": [
+    "Simon"
+  ],
+  "contact": {
+    "sources": "https://github.com/BookCatKid/ArcadeDisastersPlus"
+  },
   "license": "MIT",
   "icon": "assets/arcadedisastersplus/icon.png",
   "environment": "client",

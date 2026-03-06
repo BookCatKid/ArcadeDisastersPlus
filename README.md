@@ -1,6 +1,6 @@
 # ArcadeDisasters+
 
-ArcadeDisasters+ is a Fabric client-side mod designed for the new Hypixel "Disasters" arcade game. It just provides a few simple QOL features that I wanted while playing.
+ArcadeDisasters+ is a Fabric client-side mod designed for the new Hypixel 'Disasters' arcade game. It just provides a few simple QOL features that I wanted while playing.
 
 ## Features
 
