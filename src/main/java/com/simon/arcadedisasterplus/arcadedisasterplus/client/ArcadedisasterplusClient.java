@@ -17,5 +17,7 @@ public class ArcadedisasterplusClient implements ClientModInitializer {
                 });
             }
         });
+
+        GameModeDetector.register();
     }
 }
