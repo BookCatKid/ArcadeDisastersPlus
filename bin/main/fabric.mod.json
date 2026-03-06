@@ -1,21 +1,24 @@
 {
   "schemaVersion": 1,
-  "id": "arcadedisasterplus",
+  "id": "arcadedisastersplus",
   "version": "${version}",
-  "name": "ArcadeDisaster+",
+  "name": "ArcadeDisasters+",
   "description": "",
   "authors": [],
   "contact": {},
   "license": "MIT",
-  "icon": "assets/arcadedisasterplus/icon.png",
+  "icon": "assets/arcadedisastersplus/icon.png",
   "environment": "client",
   "entrypoints": {
     "client": [
-      "com.simon.arcadedisasterplus.arcadedisasterplus.client.ArcadedisasterplusClient"
+      "com.simon.arcadedisastersplus.arcadedisastersplus.client.ArcadedisastersplusClient"
+    ],
+    "modmenu": [
+      "com.simon.arcadedisastersplus.arcadedisastersplus.client.ModMenuIntegration"
     ]
   },
   "mixins": [
-    "arcadedisasterplus.mixins.json"
+    "arcadedisastersplus.mixins.json"
   ],
   "depends": {
     "fabricloader": ">=${loader_version}",

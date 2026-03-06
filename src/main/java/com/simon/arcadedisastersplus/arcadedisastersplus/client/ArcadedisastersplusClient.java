@@ -1,4 +1,4 @@
-package com.simon.arcadedisasterplus.arcadedisasterplus.client;
+package com.simon.arcadedisastersplus.arcadedisastersplus.client;
 
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.fabric.api.client.command.v2.ClientCommandRegistrationCallback;
@@ -12,17 +12,17 @@ import net.minecraft.text.Text;
 
 import static net.fabricmc.fabric.api.client.command.v2.ClientCommandManager.literal;
 
-public class ArcadedisasterplusClient implements ClientModInitializer {
+public class ArcadedisastersplusClient implements ClientModInitializer {
 
     @Override
     public void onInitializeClient() {
-        ArcadedisasterplusConfig.load();
+        ArcadedisastersplusConfig.load();
 
         ClientPlayConnectionEvents.JOIN.register((handler, sender, client) -> {
-            if (ArcadedisasterplusConfig.devMode && client.getCurrentServerEntry() != null && (client.getCurrentServerEntry().address.toLowerCase().equals("hypixel.net") || client.getCurrentServerEntry().address.toLowerCase().endsWith(".hypixel.net"))) {
+            if (ArcadedisastersplusConfig.devMode && client.getCurrentServerEntry() != null && (client.getCurrentServerEntry().address.toLowerCase().equals("hypixel.net") || client.getCurrentServerEntry().address.toLowerCase().endsWith(".hypixel.net"))) {
                 client.execute(() -> {
                     if (client.player != null) {
-                        client.player.sendMessage(Text.literal("§c[ArcadeDisaster+] §aYou are on Hypixel."), false);
+                        client.player.sendMessage(Text.literal("§c[ArcadeDisasters+] §aYou are on Hypixel."), false);
                     }
                 });
             }

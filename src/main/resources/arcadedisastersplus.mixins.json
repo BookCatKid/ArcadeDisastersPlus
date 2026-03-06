@@ -1,7 +1,7 @@
 {
   "required": true,
   "minVersion": "0.8",
-  "package": "com.simon.arcadedisasterplus.arcadedisasterplus.mixin",
+  "package": "com.simon.arcadedisastersplus.arcadedisastersplus.mixin",
   "compatibilityLevel": "JAVA_21",
   "mixins": [
   ],

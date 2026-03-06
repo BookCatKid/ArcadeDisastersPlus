@@ -1,4 +1,4 @@
-package com.simon.arcadedisasterplus.arcadedisasterplus.client;
+package com.simon.arcadedisastersplus.arcadedisastersplus.client;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
@@ -10,10 +10,10 @@ import java.io.Writer;
 import java.nio.file.Files;
 import java.nio.file.Path;
 
-public class ArcadedisasterplusConfig {
+public class ArcadedisastersplusConfig {
 
     private static final Gson GSON = new GsonBuilder().setPrettyPrinting().create();
-    private static final Path CONFIG_PATH = FabricLoader.getInstance().getConfigDir().resolve("arcadedisasterplus.json");
+    private static final Path CONFIG_PATH = FabricLoader.getInstance().getConfigDir().resolve("arcadedisastersplus.json");
 
     public static boolean showDisasterTitles = true;
     public static boolean showChatMessages = true;

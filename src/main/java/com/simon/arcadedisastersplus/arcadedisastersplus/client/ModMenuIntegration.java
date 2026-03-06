@@ -1,4 +1,4 @@
-package com.simon.arcadedisasterplus.arcadedisasterplus.client;
+package com.simon.arcadedisastersplus.arcadedisastersplus.client;
 
 import com.terraformersmc.modmenu.api.ConfigScreenFactory;
 import com.terraformersmc.modmenu.api.ModMenuApi;
